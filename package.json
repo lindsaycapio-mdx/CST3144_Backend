@@ -2,10 +2,11 @@
     "name": "static-file-fun",
     "private": true,
     "scripts": {
-        "start": "nodemon app.js"
+        "start": "node server.js"
     },
     "dependencies": {
         "express": "^5.1.0",
         "mongodb": "^3.6.3"
     }
 }
+
