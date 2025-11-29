@@ -59,6 +59,24 @@ app.get('/collection/:collectionName/:id', (req, res, next) => {
     });
 });
 
+app.get('/search/:collectionName', (req, res, next) => {
+    const query = {};
+
+    query['$or'] = [
+        { subject: { $regex: req.query.search, $options: 'i' } },
+        { location: { $regex: req.query.search, $options: 'i' } },
+        { price: { $regex: req.query.search, $options: 'i' } },
+        { availability: { $regex: req.query.search, $options: 'i' } }
+    ];
+
+    req.collection.find(query).toArray((err, results) => {
+        if (err) return next(err);
+        res.json(results);
+        console.log(`searching ${query} in ${req.params.collectionName}`);
+        console.log(results);
+    });
+});
+
 app.put('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.update(
         {_id: new ObjectID(req.params.id)},
