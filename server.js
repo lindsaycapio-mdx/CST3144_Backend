@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+var path = require("path");
 app.set('PORT', 3000);
 
 app.use(express.json());
@@ -19,6 +20,9 @@ let db;
 MongoClient.connect('mongodb+srv://lc1232_db_user:kRe411FRTQsnVB4Y@m00913284-cst3144.ail8qtc.mongodb.net', (err, client) => {
     db = client.db("CST3144_M00913284");
 });
+
+var imagesPath = path.resolve(__dirname, "images");
+app.use("/images", express.static(imagesPath));
 
 app.get('/', (req, res, next) => {
     res.send("select a collection, e.g., /collection/messages")
@@ -97,6 +101,10 @@ app.delete('/collection/:collectionName/:id', (req, res, next) => {
             if (e) return next(e)
                 res.send((result.result.n === 1) ? {msg: 'success'} : {msg: 'error'});
         });
+});
+
+app.use('/images/', (req, res, next) => {
+    res.end("this image does not exist");
 });
 
 const port = process.env.PORT || 3000;
