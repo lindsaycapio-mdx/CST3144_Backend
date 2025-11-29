@@ -9,7 +9,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
  
     next();
 })
@@ -76,8 +76,8 @@ app.get('/search/:collectionName', (req, res, next) => {
     req.collection.find(query).toArray((err, results) => {
         if (err) return next(err);
         res.json(results);
-        console.log(`searching ${query} in ${req.params.collectionName}`);
-        console.log(results);
+        let stringQuery = JSON.stringify(req.query.search);
+        console.log(new Date() + ` - searching ${stringQuery} in ${req.params.collectionName}`);
     });
 });
 
@@ -111,5 +111,4 @@ const port = process.env.PORT || 3000;
 
 app.listen(port, () => {
     console.log("express.js server is running on localhost:3000");
-
 });
