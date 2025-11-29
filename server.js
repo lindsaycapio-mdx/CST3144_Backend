@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+app.set('PORT', 3000);
 
 app.use(express.json());
 
@@ -32,12 +33,18 @@ app.get('/collection/:collectionName', (req, res, next) => {
     req.collection.find({}).toArray((e, results) => {
         if (e) return next (e)
             res.send(results);
+
+            console.log("\ngetting lessons on: " + new Date());
+            console.log(results);
     });
 });
 
 app.post('/collection/:collectionName', (req, res, next) => {
     req.collection.insert(req.body, (e, results) => {
         res.send(results.ops);
+
+        console.log("\nadding order on: " + new Date());
+        console.log(results.ops);
     });
 });
 
@@ -47,6 +54,8 @@ app.get('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.findOne({ _id: new ObjectID(req.params.id)}, (e, result) => {
         if (e) return next(e)
             res.send(result);
+            console.log("\ngetting lesson on: " + new Date());
+            console.log(results);
     });
 });
 
@@ -58,6 +67,8 @@ app.put('/collection/:collectionName/:id', (req, res, next) => {
         (e, result) => {
             if (e) return next(e)
                 res.send((result.result.n === 1) ? {msg: 'success'} : {msg: 'error'});
+                console.log("\nupdating availability on: " + new Date());
+                console.log(results);
         });
 });
 
