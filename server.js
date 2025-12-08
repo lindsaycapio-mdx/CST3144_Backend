@@ -1,10 +1,16 @@
 const express = require("express");
+const cors = require("cors");
 const app = express();
 var path = require("path");
 var fs = require("fs");
 app.set('PORT', 3000);
 
 app.use(express.json());
+
+app.use(cors({
+  origin: 'https://lindsaycapio-mdx.github.io',
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,6 +28,7 @@ MongoClient.connect('mongodb+srv://lc1232_db_user:kRe411FRTQsnVB4Y@m00913284-cst
     db = client.db("CST3144_M00913284");
 });
 
+const ObjectID = require('mongodb').ObjectID;
 app.get('/', (req, res, next) => {
     res.send("select a collection, e.g., /collection/messages")
 });
@@ -49,8 +56,6 @@ app.post('/collection/:collectionName', (req, res, next) => {
         console.log(results.ops);
     });
 });
-
-const ObjectID = require('mongodb').ObjectID;
 
 app.get('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.findOne({ _id: new ObjectID(req.params.id)}, (e, result) => {
