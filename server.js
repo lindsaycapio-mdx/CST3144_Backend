@@ -7,11 +7,6 @@ app.set('PORT', 3000);
 
 app.use(express.json());
 
-app.use(cors({
-  origin: 'https://lindsaycapio-mdx.github.io',
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
-}));
-
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("Access-Control-Allow-Credentials", "true");
@@ -20,6 +15,8 @@ app.use((req, res, next) => {
  
     next();
 })
+
+app.use(cors({}));
 
 const MongoClient = require("mongodb").MongoClient;
 
