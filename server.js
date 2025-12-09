@@ -47,7 +47,8 @@ app.get('/collection/:collectionName', (req, res, next) => {
 
 app.post('/collection/:collectionName', (req, res, next) => {
     req.collection.insert(req.body, (e, results) => {
-        res.send(results.ops);
+        if (e) return next (e)
+            res.send(results.ops);
 
         console.log("\nadding order on: " + new Date());
         console.log(results.ops);
