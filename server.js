@@ -1,5 +1,4 @@
 const express = require("express");
-const cors = require("cors");
 const app = express();
 var path = require("path");
 var fs = require("fs");
@@ -7,16 +6,14 @@ app.set('PORT', 3000);
 
 app.use(express.json());
 
-app.use((req, res, next) => {
+app.use ((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, OPTIONS, POST, PUT");
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin, Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
  
     next();
 });
-
-app.use(cors());
 
 const MongoClient = require("mongodb").MongoClient;
 
@@ -51,14 +48,14 @@ app.post('/collection/:collectionName', (req, res, next) => {
             res.send(results.ops);
 
         console.log("\nadding order on: " + new Date());
-        console.log(results.ops);
+        console.log(results);
     });
 });
 
 app.get('/collection/:collectionName/:id', (req, res, next) => {
-    req.collection.findOne({ _id: new ObjectID(req.params.id)}, (e, result) => {
+    req.collection.findOne({ _id: new ObjectID(req.params.id)}, (e, results) => {
         if (e) return next(e)
-            res.send(result);
+            res.send(results);
             console.log("\ngetting lesson on: " + new Date());
             console.log(results);
     });
@@ -68,10 +65,10 @@ app.get('/search/:collectionName', (req, res, next) => {
     const query = {};
 
     query['$or'] = [
-        { subject: { $regex: req.query.search, $options: 'i' } },
-        { location: { $regex: req.query.search, $options: 'i' } },
-        { price: { $regex: req.query.search, $options: 'i' } },
-        { availability: { $regex: req.query.search, $options: 'i' } }
+        {subject: {$regex: req.query.search, $options: 'i'}} ,
+        {location: {$regex: req.query.search, $options: 'i'}},
+        {price: {$regex: req.query.search, $options: 'i'}},
+        {availability: {$regex: req.query.search, $options: 'i'}}
     ];
 
     req.collection.find(query).toArray((err, results) => {
@@ -87,9 +84,9 @@ app.put('/collection/:collectionName/:id', (req, res, next) => {
         {_id: new ObjectID(req.params.id)},
         {$set: req.body},
         {safe: true, multi: false},
-        (e, result) => {
+        (e, results) => {
             if (e) return next(e)
-                res.send((result.result.n === 1) ? {msg: 'success'} : {msg: 'error'});
+                res.send((results.matchedCount === 1) ? {msg: 'success'} : {msg: 'error'});
                 console.log("\nupdating availability on: " + new Date());
                 console.log(results);
         });
@@ -98,9 +95,9 @@ app.put('/collection/:collectionName/:id', (req, res, next) => {
 app.delete('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.deleteOne(
         {_id: new ObjectID(req.params.id)},
-        (e, result) => {
+        (e, results) => {
             if (e) return next(e)
-                res.send((result.result.n === 1) ? {msg: 'success'} : {msg: 'error'});
+                res.send((results.results.n === 1) ? {msg: 'success'} : {msg: 'error'});
         });
 });
 
