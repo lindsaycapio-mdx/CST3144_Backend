@@ -6,7 +6,7 @@ app.set('PORT', 3000);
 
 app.use(express.json());
 
-app.use ((req, res, next) => {
+app.use ((req,res,next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.setHeader("Access-Control-Allow-Methods", "GET,HEAD,OPTIONS,POST,PUT");
@@ -54,6 +54,7 @@ app.post('/collection/:collectionName', (req, res, next) => {
 
 app.get('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.findOne({ _id: new ObjectID(req.params.id)}, (e, results) => {
+        // if this event is done, we move on2 the next middleware
         if (e) return next(e)
             res.send(results);
             console.log("\ngetting lesson on: " + new Date());
@@ -64,16 +65,26 @@ app.get('/collection/:collectionName/:id', (req, res, next) => {
 app.get('/search/:collectionName', (req, res, next) => {
     const query = {};
 
+    const regexOnlyNumber = /^\d+$/;
+    var searchItem = req.query.search;
+
+    // checking if the string is of numbers only
+    if (regexOnlyNumber.test(searchItem) === true){
+        // changing to int
+        searchItem = +searchItem;
+    };
+
+    // checks if the expressions 
     query['$or'] = [
         {subject: {$regex: req.query.search, $options: 'i'}} ,
         {location: {$regex: req.query.search, $options: 'i'}},
-        {price: {$regex: req.query.search, $options: 'i'}},
-        {availability: {$regex: req.query.search, $options: 'i'}}
+        {price: searchItem},
+        {availability: searchItem}
     ];
 
     req.collection.find(query).toArray((err, results) => {
         if (err) return next(err);
-        res.json(results);
+            res.json(results);
         let stringQuery = JSON.stringify(req.query.search);
         console.log(new Date() + ` - searching ${stringQuery} in ${req.params.collectionName}`);
     });
@@ -81,9 +92,10 @@ app.get('/search/:collectionName', (req, res, next) => {
 
 app.put('/collection/:collectionName/:id', (req, res, next) => {
     req.collection.update(
+        // mongodb function that makes new id object with the req id
         {_id: new ObjectID(req.params.id)},
+        // updating value
         {$set: req.body},
-        {safe: true, multi: false},
         (e, results) => {
             if (e) return next(e)
                 res.send((results.matchedCount === 1) ? {msg: 'success'} : {msg: 'error'});
@@ -115,8 +127,10 @@ app.use(function(req, res, next){
     });
 });
 
+// just gives access 2 either the port environment variable or port 3000
 const port = process.env.PORT || 3000;
 
+// listening on the port
 app.listen(port, () => {
     console.log("express.js server is running on localhost:3000");
 });
